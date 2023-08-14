@@ -3,12 +3,10 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { AllExceptionsFilter } from '@core/exceptions/all-exception.filter';
 import { RedisIoAdapter } from 'src/features/gateway/redis-io.adapter';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import * as bodyParser from 'body-parser';
-import { raw } from 'express';
 import { apmMiddleware } from '@core/apm';
 import { AppLogger } from '@core/logger';
 
@@ -18,12 +16,13 @@ async function bootstrap() {
   };
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
   const configService = app.get(ConfigService);
 
   const port = configService.get('LOCAL_PORT');
-
-  app.use(bodyParser.json({ limit: '50mb' }));
-  app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
   app.use(apmMiddleware);
   const logger = new AppLogger(configService);
@@ -57,7 +56,6 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
 
   app.enableCors();
-  app.use('/payment/webhook', raw({ type: 'application/json' })); // raw body for webhook
 
   const httpAdapterHost = app.get(HttpAdapterHost);
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));

@@ -1,4 +1,4 @@
-import { Module, CacheModule, MiddlewareConsumer, RequestMethod, NestModule } from '@nestjs/common';
+import { Module, MiddlewareConsumer, RequestMethod, NestModule } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import redisStore from 'cache-manager-redis-store';
@@ -11,25 +11,24 @@ import { GatewayModule } from 'src/features/gateway/gateway.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ApmModule } from '@core/apm';
 import { LoggerMiddleware, LoggerModule } from '@core/logger';
-import { ClsModule } from 'nestjs-cls';
 import { SharedModule } from './common/shared-module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import typeorm from './config/typeorm';
+import { CacheModule } from '@nestjs/cache-manager';
+import { AsyncLocalStorage } from 'async_hooks';
+import { QueueModule } from '@core/queue/queue.module';
 
 @Module({
   controllers: [AppController],
   imports: [
+    ConfigModule.forRoot({ isGlobal: true, expandVariables: true, load: [typeorm] }),
+    LoggerModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => configService.get('typeorm'),
       inject: [ConfigService],
     }),
     SharedModule,
-    ClsModule.forRoot({
-      global: true,
-    }),
-    LoggerModule.forRoot(),
-    ConfigModule.forRoot({ isGlobal: true, expandVariables: true, load: [typeorm] }),
     CacheModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -41,6 +40,7 @@ import typeorm from './config/typeorm';
       isGlobal: true,
       inject: [ConfigService],
     }),
+    QueueModule.forRoot(),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
@@ -53,7 +53,6 @@ import typeorm from './config/typeorm';
     }),
     UserModule,
     AuthModule,
-    LoggerModule,
     JobModule,
     GatewayModule,
     ApmModule.register(),
@@ -66,7 +65,23 @@ import typeorm from './config/typeorm';
   ],
 })
 export class AppModule implements NestModule {
+  constructor(private readonly als: AsyncLocalStorage<{ userId: string }>) {}
+
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes({ path: '*', method: RequestMethod.ALL });
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL })
+      .apply((req, res, next) => {
+        // populate the store with some default values
+        // based on the request,
+        const store = {
+          userId: req.headers['x-user-id'],
+        };
+        // and pass the "next" function as callback
+        // to the "als.run" method together with the store.
+        this.als.run(store, () => next());
+      })
+      // and register it for all routes (in case of Fastify use '(.*)')
+      .forRoutes('*');
   }
 }
