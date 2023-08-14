@@ -24,6 +24,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "compodoc": "npx @compodoc/compodoc -p tsconfig.json -s",
     "prepare": "husky install"
   },
   "dependencies": {
@@ -69,6 +70,7 @@
     "winston-elasticsearch": "^0.17.2"
   },
   "devDependencies": {
+    "@compodoc/compodoc": "^1.1.21",
     "@nestjs/cli": "^9.3.0",
     "@nestjs/schematics": "^9.0.4",
     "@nestjs/testing": "^9.3.10",
