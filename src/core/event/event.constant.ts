@@ -1,0 +1,1 @@
+export const EVENT_METADATA = 'EVENT_METADATA';

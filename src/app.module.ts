@@ -17,6 +17,7 @@ import typeorm from './config/typeorm';
 import { CacheModule } from '@nestjs/cache-manager';
 import { AsyncLocalStorage } from 'async_hooks';
 import { QueueModule } from '@core/queue/queue.module';
+import { EventModule } from '@core/event/event.module';
 
 @Module({
   controllers: [AppController],
@@ -41,6 +42,7 @@ import { QueueModule } from '@core/queue/queue.module';
       inject: [ConfigService],
     }),
     QueueModule.forRoot(),
+    EventModule.forRoot(),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
