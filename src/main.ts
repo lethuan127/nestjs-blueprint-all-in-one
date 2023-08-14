@@ -10,6 +10,8 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { apmMiddleware } from '@core/apm';
 import { AppLogger } from '@core/logger';
 
+declare const module: any;
+
 async function bootstrap() {
   BigInt.prototype['toJSON'] = function () {
     return parseInt(this);
@@ -67,5 +69,10 @@ async function bootstrap() {
   await app.listen(process.env.PORT || port, () => {
     console.log(`Server started with port ${process.env.PORT || port}`);
   });
+
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
 }
 bootstrap();

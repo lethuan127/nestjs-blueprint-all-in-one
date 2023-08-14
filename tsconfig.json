@@ -2,6 +2,7 @@
   "compilerOptions": {
     "module": "CommonJS",
     "target": "ES2022",
+    "lib": ["ES2021", "ES2022"],
     "types": ["node"],
     "declaration": true,
     "removeComments": true,
@@ -19,6 +20,7 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
+    "typeRoots": ["./node_modules/@types", "./src/types"],
     "paths": {
       "@utils/*": ["src/utils/*"],
       "@core/*": ["src/core/*"],
