@@ -10,4 +10,3 @@ const RepositoryModule = TypeOrmModule.forFeature(Object.values(entities));
   exports: [RepositoryModule],
 })
 export class SharedModule {}
-
