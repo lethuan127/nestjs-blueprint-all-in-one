@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { OnQueueActive, OnQueueCompleted, OnQueueFailed, Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
@@ -7,8 +7,6 @@ import { SNAPSHOT_QUEUE_NAME } from '../constant';
 @Processor(SNAPSHOT_QUEUE_NAME)
 export class SnapshotConsumer {
   private readonly logger = new Logger(SnapshotConsumer.name);
-
-  constructor() { }
 
   @OnQueueActive()
   onActive(job: Job<unknown>) {
@@ -26,6 +24,5 @@ export class SnapshotConsumer {
   }
 
   @Process()
-  async snapshot(_job: Job) {
-  }
+  async snapshot(_job: Job) {}
 }

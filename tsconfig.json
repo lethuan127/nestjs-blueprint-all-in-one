@@ -24,6 +24,7 @@
     "paths": {
       "@utils/*": ["src/utils/*"],
       "@core/*": ["src/core/*"],
+      "@entities/*": ["src/entities/*"],
       "@auth/*": ["src/features/auth/*"],
       "@user/*": ["src/features/user/*"],
       "@job/*": ["src/features/job/*"],

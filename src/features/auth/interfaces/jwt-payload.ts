@@ -1,5 +1,5 @@
 export interface IJwtPayload {
-  id: number;
+  id: bigint;
   email: string;
-  accountId: number;
+  role: string;
 }

@@ -1,12 +1,4 @@
-import {
-  CACHE_MANAGER,
-  CanActivate,
-  ExecutionContext,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { Cache } from 'cache-manager';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
