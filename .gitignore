@@ -38,6 +38,3 @@ lerna-debug.log*
 
 .env
 .env.docker
-files/
-
-firebase-adminsdk.json
