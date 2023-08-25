@@ -1,16 +1,19 @@
 import apmAgent from 'elastic-apm-node';
 import 'dotenv/config';
+let apm: apmAgent.Agent | undefined;
 
-const options: apmAgent.AgentConfigOptions = {
-  serviceName: 'nexg-api',
-  serverUrl: process.env.APM_HOST,
-  secretToken: process.env.APM_SECRET_TOKEN,
-  captureBody: 'errors',
-};
+if (process.env.APM_HOST) {
+  const options: apmAgent.AgentConfigOptions = {
+    serviceName: 'nexg-api',
+    serverUrl: process.env.APM_HOST,
+    secretToken: process.env.APM_SECRET_TOKEN,
+    captureBody: 'errors',
+  };
 
-const apm: apmAgent.Agent = apmAgent.start(options);
+  apm = apmAgent.start(options);
+  apm.handleUncaughtExceptions((err) => {
+    console.error('handleUncaughtExceptions', err);
+  });
+}
 
-apm.handleUncaughtExceptions((err) => {
-  console.error('handleUncaughtExceptions', err);
-});
 export { apm };
